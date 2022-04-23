@@ -13,7 +13,6 @@ type OnUpdate = () => void
 
 type Options = {
   interval: number
-  autostart: boolean
   onUpdate?: OnUpdate
 }
 
@@ -30,25 +29,24 @@ const reducer = (state: State, action: Action): State => {
 
 export const useInterval = ({
   interval = 1000,
-  autostart = false,
   onUpdate,
 }: Partial<Options>): [State, Control] => {
+
   const onUpdateRef = useRef<OnUpdate>(() => {})
   const [state, dispatch] = useReducer(reducer, 'STOPPED')
+
   const start = () => {
     dispatch({ type: 'start' })
   }
+
   const stop = () => {
     dispatch({ type: 'stop' })
   }
+
   useEffect(() => {
     onUpdateRef.current = onUpdate ?? (() => {})
   }, [onUpdate])
-  useEffect(() => {
-    if (autostart) {
-      dispatch({ type: 'start' })
-    }
-  }, [autostart])
+
   useEffect(() => {
     let timerId: NodeJS.Timeout | undefined = undefined
     if (state === 'RUNNING') {
@@ -63,6 +61,7 @@ export const useInterval = ({
     }
   }, [interval, state])
   return [state, { start, stop }]
+
 }
 
 export default useInterval
