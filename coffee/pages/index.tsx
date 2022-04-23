@@ -1,7 +1,6 @@
 import React from 'react';
 import type { NextPage } from 'next';
 import { Params } from 'next/dist/server/router';
-import Head from 'next/head';
 
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
@@ -24,19 +23,6 @@ const Home: NextPage = ({ onUpdate }: Params) => {
   return (
     <>
 
-      <Head>
-        <title>Coffee</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/icon?family=Material+Icons"
-        />
-      </Head>
-
       <p>{timer}</p>
 
       <Button variant="contained">
@@ -57,4 +43,4 @@ const Home: NextPage = ({ onUpdate }: Params) => {
   )
 }
 
-export default Home
+export default Home;
