@@ -11,7 +11,8 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import TextField from '@mui/material/TextField';
 
-import useInterval from 'hooks/useInterval';
+import Step from '@interfaces/step'
+import useInterval from '@hooks/useInterval';
 
 
 const displayTime = (time: number): string =>  {
@@ -36,56 +37,164 @@ const displayTime = (time: number): string =>  {
 
 const Home: NextPage = ({ onUpdate }: Params) => {
 
-  const [fields, setFields] = React.useState<number>(1);
-  const [timer, setTimer] = React.useState<number>(0);
+
+  const [steps, setSteps] = React.useState<Step[]>([{water: 0, time: 0}]);
+  const [water, setWater] = React.useState<number>(0);
+  const [time, setTime] = React.useState<number>(0);
+  const [count, setCount] = React.useState<boolean>(false);
+
+
+  const handleUpdate = () => {
+
+    // 湯量と時間それぞれの合計
+    const stepSum: Step = {water: 0, time:0};
+
+    // カウンターストップ（59:59:99）
+    if (time < 3599990) {
+      setTime(time + 10)
+    } else {
+      setTime(3599990)
+    };
+
+    // 時刻から現在の目標湯量を計算
+    for (const step of steps) {
+
+      const stepTime: number = step.time * 1000;  // ミリ秒に変換
+
+      if (time <= stepTime +  stepSum.time) {
+        if (stepTime === 0) {
+          setWater(step.water);
+        } else {
+          setWater((time - stepSum.time) / stepTime * step.water + stepSum.water);
+        };
+        break;
+      } else {
+        stepSum.water += step.water;
+        stepSum.time += stepTime;
+      };
+
+    };
+
+  };
+
 
   const [state, { start, stop }] = useInterval({
     interval: 10,
-    onUpdate: () => timer < 3599990 ? setTimer(timer + 10): setTimer(3599990),  // 59:59:99
-  })
+    onUpdate: handleUpdate
+  });
+
+
+  const handelChange = (e: any, i: number, type: 'water'|'time'): void => {
+
+    const value: string = e.target.value;
+  
+    if (value !== '') {
+
+      let num: number = Number(value);
+      num = Math.floor(num * 10) / 10;  // 小数第二位を切り捨て
+      num = Math.abs(num);
+
+      e.target.value = String(num);
+
+      const copiedSteps: Step[] = [...steps];
+      copiedSteps[i][type] = num;
+      setSteps(copiedSteps);
+
+    }
+    
+  };
+
+
+  const handleStart = (): void => {
+    start();
+    setCount(true);
+  };
+
+
+  const handleStop = (): void => {
+    stop();
+  };
+
+
+  const handleReset = (): void => {
+    stop();
+    setCount(false);
+    setWater(0);
+    setTime(0);
+  };
+
+
+  const handleAdd = (): void => {
+    const copiedSteps: Step[] = [...steps];
+    copiedSteps.push({water: 0, time: 0});
+    setSteps(copiedSteps);
+  };
+
+
+  const handleRemove = (): void => {
+    const copiedSteps: Step[] = [...steps];
+    copiedSteps.pop();
+    setSteps(copiedSteps);
+  };
+
 
   return (
     <>
 
-      <p>{displayTime(timer)}</p>
+      <p>{displayTime(time)}</p>
+      <p>{water}</p>
 
       <div>
         <Button variant="contained">
-          <RestartAltIcon  color="primary" onClick={() => {stop(); setTimer(0);}} />
+          <RestartAltIcon  color="primary" onClick={handleReset} />
         </Button>
 
         {state === 'RUNNING' ? (
           <Button variant="contained">
-            <PauseIcon  color="primary" onClick={stop} />
+            <PauseIcon  color="primary" onClick={handleStop} />
           </Button>
         ) : (
           <Button variant="contained">
-            <PlayArrowIcon color="primary" onClick={start} />
+            <PlayArrowIcon color="primary" onClick={handleStart} />
           </Button>
         )}
       </div>
 
-      {[...Array(fields)].map((e: void[], i: number) => (
+      {steps.map((step: Step, i: number) => (
         <div>
-          <TextField label="Water" required />
-          <TextField label="Time" />
-          {i === fields - 1 && (
-            <div>
-              <IconButton onClick={() => setFields(fields + 1)}>
-                <AddIcon />
-              </IconButton>
-              {fields > 1 && (
-                <IconButton onClick={() => setFields(fields - 1)}>
-                  <RemoveIcon />
+          <TextField
+            className="water"
+            type="number"
+            label={'湯量' + String(i + 1)}
+            placeholder="0"
+            required
+            onChange={e => handelChange(e, i, 'water')}
+          />
+          <TextField
+            className="time"
+            type="number"
+            label={'時間' + String(i + 1)}
+            placeholder="0"
+            required
+            onChange={e => handelChange(e, i, 'time')}
+          />
+            {i === steps.length - 1 && !count && (
+              <div>
+                <IconButton onClick={handleAdd}>
+                  <AddIcon />
                 </IconButton>
-              )}
-            </div>
-          )}
+                {steps.length > 1 && (
+                  <IconButton onClick={handleRemove}>
+                    <RemoveIcon />
+                  </IconButton>
+                )}
+              </div>
+            )}
         </div>
       ))}
-
     </>
   )
 }
+
 
 export default Home;
