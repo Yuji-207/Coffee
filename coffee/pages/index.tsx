@@ -3,16 +3,29 @@ import type { NextPage } from 'next';
 import { Params } from 'next/dist/server/router';
 
 import AddIcon from '@mui/icons-material/Add';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RemoveIcon from '@mui/icons-material/Remove';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 import Step from '@interfaces/step'
 import useInterval from '@hooks/useInterval';
+
+
+const displayWeight = (weight: number): string => {
+  const integer: number = Math.floor(weight);
+  const decimal: number = Math.floor(weight % 1 * 10);
+  const display: string = String(integer).padStart(3, '0') + '.' + String(decimal) + ' g';
+  return display;
+};
 
 
 const displayTime = (time: number): string =>  {
@@ -139,16 +152,54 @@ const Home: NextPage = ({ onUpdate }: Params) => {
 
 
   return (
-    <>
+    <Container>
 
-      <p>{displayTime(time)}</p>
-      <p>{water}</p>
+      <Box m={2} pt={3}>
+        <Typography variant="h1" align="center">{displayTime(time)}</Typography>
+        <Typography variant="h2" align="center">{displayWeight(water)}</Typography>
+      </Box>
 
-      <div>
+      <Box>
+        <Stack justifyContent="center" spacing={2}>
+          {steps.map((step: Step, i: number) => (
+            <>
+              <Stack direction="row" justifyContent="center" spacing={2}>
+                <TextField
+                  className="water"
+                  type="number"
+                  label={steps.length > 1 ? '湯量' + String(i + 1) : '湯量'}
+                  placeholder="0"
+                  onChange={e => handelChange(e, i, 'water')}
+                />
+                <TextField
+                  className="time"
+                  type="number"
+                  label={steps.length > 1 ? '時間' + String(i + 1) : '時間'}
+                  placeholder="0"
+                  onChange={e => handelChange(e, i, 'time')}
+                />
+              </Stack>
+              {i === steps.length - 1 && !count && (
+                <div>
+                  <IconButton onClick={handleAdd}>
+                    <AddIcon />
+                  </IconButton>
+                  {steps.length > 1 && (
+                    <IconButton onClick={handleRemove}>
+                      <RemoveIcon />
+                    </IconButton>
+                  )}
+                </div>
+              )}
+            </>
+          ))}
+        </Stack>
+      </Box>
+
+      <Stack direction="row" justifyContent="center" spacing={8}>
         <Button variant="contained">
           <RestartAltIcon  color="primary" onClick={handleReset} />
         </Button>
-
         {state === 'RUNNING' ? (
           <Button variant="contained">
             <PauseIcon  color="primary" onClick={handleStop} />
@@ -158,41 +209,9 @@ const Home: NextPage = ({ onUpdate }: Params) => {
             <PlayArrowIcon color="primary" onClick={handleStart} />
           </Button>
         )}
-      </div>
+      </Stack>
 
-      {steps.map((step: Step, i: number) => (
-        <div>
-          <TextField
-            className="water"
-            type="number"
-            label={'湯量' + String(i + 1)}
-            placeholder="0"
-            required
-            onChange={e => handelChange(e, i, 'water')}
-          />
-          <TextField
-            className="time"
-            type="number"
-            label={'時間' + String(i + 1)}
-            placeholder="0"
-            required
-            onChange={e => handelChange(e, i, 'time')}
-          />
-            {i === steps.length - 1 && !count && (
-              <div>
-                <IconButton onClick={handleAdd}>
-                  <AddIcon />
-                </IconButton>
-                {steps.length > 1 && (
-                  <IconButton onClick={handleRemove}>
-                    <RemoveIcon />
-                  </IconButton>
-                )}
-              </div>
-            )}
-        </div>
-      ))}
-    </>
+    </Container>
   )
 }
 
