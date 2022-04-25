@@ -6,11 +6,27 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 
 
-const Steps: React.FC = () => {
+interface Props {
+  readOnly: boolean;
+}
 
+
+const Steps: React.FC<Props> = (props) => {
+
+  
+  const readOnly: boolean = props.readOnly;
 
   const [tooltipTitle, setTooltipTitle] = React.useState<string>('');
   const [steps, setSteps] = React.useState<Step[]>([{water: 0, time: 0}]);
+
+
+  React.useEffect(() => {
+    if (readOnly) {
+      setTooltipTitle('抽出開始後は編集できません')
+    } else {
+      setTooltipTitle('');
+    }
+  }, [readOnly]);
 
 
   const validateNumber = (e: any, i: number, type: 'water'|'time'): void => {
@@ -132,8 +148,12 @@ const Steps: React.FC = () => {
               type="number"
               label="注入時間（秒）"
               placeholder="0"
+              helperText={i + 1 + '投目'}
               onChange={e => handleTimeChange(e, i)}
               onKeyDown={(e: any) => handleTimeField(e)}
+              InputProps={{
+                readOnly: readOnly ? true : false,
+              }}
             />
           </Tooltip>
           <Tooltip title={tooltipTitle}  arrow>
@@ -145,6 +165,9 @@ const Steps: React.FC = () => {
               placeholder="0"
               onChange={e => handleWaterChange(e, i)}
               onKeyDown={(e: any) => handleWaterField(e)}
+              InputProps={{
+                readOnly: readOnly ? true : false,
+              }}
             />
             </Tooltip>
         </Box>

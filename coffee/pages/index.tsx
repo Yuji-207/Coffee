@@ -111,7 +111,7 @@ const Home: React.FC<void> = () => {
       <Header />
       <Box className="container mx-auto  justify-center text-center">
         <Display time={time} weight={water} />
-        <Steps />
+        <Steps readOnly={button !== 'start'} />
       </Box>
       <Footer>
         {button == 'start' ? (
