@@ -7,6 +7,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import Stack from '@mui/material/Stack';
 import Step from '@interfaces/step'
 import TextField from '@mui/material/TextField';
+import { geteuid } from 'process';
 
 
 interface Props {
@@ -40,45 +41,89 @@ const Steps: React.FC<Props> = (props) => {
 
     }
     
-  };
+  }
 
 
   const handleAdd = (): void => {
     const copiedSteps: Step[] = [...steps];
     copiedSteps.push({water: 0, time: 0});
     setSteps(copiedSteps);
-  };
+  }
 
 
   const handleRemove = (): void => {
     const copiedSteps: Step[] = [...steps];
     copiedSteps.pop();
     setSteps(copiedSteps);
-  };
+  }
+
+
+  const handleTimeField = async (e: any) => {
+
+    let id: string = e.target.id.slice(5);
+    const value: string = e.target.value;
+    const key: any = e.key;
+    
+    if ((key === 'Enter' || key === 'Tab') && value !== '') {  // tabだと2ことぶ
+      const timeField: any = document.getElementById('water-' + id);
+      timeField.focus();
+    } else if ((key === 'Backspace' || key === 'backspace') && value === '' && id !== '0') {  // backspace？
+      await handleRemove();
+      id = String(Number(id) - 1); 
+      const timeField: any = document.getElementById('water-' + id);
+      timeField.focus();
+    }
+
+  }
+
+
+  const handleWaterField = async (e: any) => {
+
+      let id: string = e.target.id.slice(6);
+      const value: string = e.target.value;
+      const key: any = e.key;
+      
+      if ((key === 'Enter' || key === 'Tab') && value !== '') {  // tabだと2ことぶ
+        await handleAdd();
+        id = String(Number(id) + 1);
+        const waterField: any = document.getElementById('time-' + id);
+        waterField.focus();
+      } else if ((key === 'Backspace' || key === 'backspace') && value === '') {  // backspace？
+        console.log(id)
+        console.log('time-' + id)
+        const waterField: any = document.getElementById('time-' + id);
+        waterField.focus();
+      }
+  
+    }
   
 
   return (
     <Stack className="m-5" spacing={3}>
       {steps.map((step: Step, i: number) => (
-        <Box className="flex flex-row justify-center" key={i+1}>
+        <Box className="flex flex-row justify-center" key={i}>
           <Box className="flex-grow flex justify-end mr-2">
             <TextField
+              id={'time-' + i}
               className="time"
               type="number"
               label={steps.length > 1 ? '時間' + String(i + 1) : '時間'}
               placeholder="0"
               onChange={e => handelChange(e, i, 'time')}
+              onKeyDown={(e: any) => handleTimeField(e)}
             />
           </Box>
           <Box className="flex-grow flex justify-start ml-2">
             <TextField
+              id={'water-' + i}
               className="water"
               type="number"
               label={steps.length > 1 ? '湯量' + String(i + 1) : '湯量'}
               placeholder="0"
               onChange={e => handelChange(e, i, 'water')}
+              onKeyDown={(e: any) => handleWaterField(e)}
             />
-            {i === steps.length - 1 && (
+            {/* {i === steps.length - 1 && (
               <Box className="relative">
                 <Box className="absolute h-full flex">
                   <Box className="flex flex-row self-center">
@@ -93,14 +138,14 @@ const Steps: React.FC<Props> = (props) => {
                   </Box>
                 </Box>
               </Box>
-            )}
+            )} */}
           </Box>
         </Box>
       ))}
     </Stack>
   );
 
-};
+}
 
 
 export default Steps;

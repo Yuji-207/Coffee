@@ -1,5 +1,6 @@
 import React from 'react';
 
+import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import StopIcon from '@mui/icons-material/Stop';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -86,10 +87,10 @@ const Home: React.FC<void> = () => {
   return (
     <>
       <Header />
-      <Container className="justify-center text-center">
+      <Box className="container mx-auto  justify-center text-center">
         <Display time={time} weight={water} />
         <Steps steps={steps} setSteps={setSteps} />
-      </Container>
+      </Box>
       <Footer>
         {button == 'start' ? (
           <PlayArrowIcon onClick={handleStart} />
