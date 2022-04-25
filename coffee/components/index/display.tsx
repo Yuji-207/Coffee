@@ -19,8 +19,8 @@ const Display: React.FC<Props> = (props) => {
 
   return (
     <Box className="p-5 m-5">
-      <Timer className="m-5" time={time} />
-      <Scale className='m-5' weight={weight} />
+      <Timer className="pb-5" time={time} />
+      <Scale weight={weight} />
     </Box>
   );
 
