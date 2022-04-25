@@ -3,15 +3,17 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Step from '@interfaces/step'
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 
 
 const Steps: React.FC = () => {
 
 
+  const [tooltipTitle, setTooltipTitle] = React.useState<string>('');
   const [steps, setSteps] = React.useState<Step[]>([{water: 0, time: 0}]);
 
 
-  const handelChange = (e: any, i: number, type: 'water'|'time'): void => {
+  const validateNumber = (e: any, i: number, type: 'water'|'time'): void => {
 
     const value: string = e.target.value;
   
@@ -27,6 +29,36 @@ const Steps: React.FC = () => {
       copiedSteps[i][type] = num;
       setSteps(copiedSteps);
 
+    }
+    
+  }
+
+
+  const handleWaterChange = (e: any, i: number): void => {
+
+    const value: string = e.target.value;
+    validateNumber(e, i, 'water');
+
+    if (value === '') {
+      setTooltipTitle('削除ボタンで前に戻れます');
+    } else if(value !== '') {
+      setTooltipTitle('改行ボタンでステップを追加できます');
+    }
+
+  }
+
+
+  const handleTimeChange = (e: any, i: number): void => {
+
+    const value: string = e.target.value;
+    validateNumber(e, i, 'time');
+
+    if (value === '' && i > 0) {
+      setTooltipTitle('削除ボタンでステップを削除できます');
+    } else if (value !== '') {
+      setTooltipTitle('改行ボタンで移動できます');
+    } else {
+      setTooltipTitle('');
     }
     
   }
@@ -54,11 +86,13 @@ const Steps: React.FC = () => {
     
     if ((key === 'Enter' || key === 'Tab') && value !== '') {  // tabだと2ことぶ
       const timeField: any = document.getElementById('water-' + id);
+      setTooltipTitle('')
       timeField.focus();
     } else if ((key === 'Backspace' || key === 'backspace') && value === '' && id !== '0') {  // backspace？
       await removeStep();
       id = String(Number(id) - 1); 
       const timeField: any = document.getElementById('water-' + id);
+      setTooltipTitle('')
       timeField.focus();
     }
 
@@ -75,39 +109,44 @@ const Steps: React.FC = () => {
         await addStep();
         id = String(Number(id) + 1);
         const waterField: any = document.getElementById('time-' + id);
+        setTooltipTitle('削除ボタンでステップを削除できます')
         waterField.focus();
       } else if ((key === 'Backspace' || key === 'backspace') && value === '') {  // backspace？
         console.log(id)
         console.log('time-' + id)
         const waterField: any = document.getElementById('time-' + id);
+        setTooltipTitle('')
         waterField.focus();
       }
   
     }
-  
 
   return (
     <Box className="m-5" >
       {steps.map((step: Step, i: number) => (
         <Box className="step flex flex-row justify-center m-5" key={i}>
-          <TextField
-            id={'time-' + i}
-            className="mr-2"
-            type="number"
-            label={steps.length > 1 ? '時間' + String(i + 1) : '時間'}
-            placeholder="0"
-            onChange={e => handelChange(e, i, 'time')}
-            onKeyDown={(e: any) => handleTimeField(e)}
-          />
-          <TextField
-            id={'water-' + i}
-            className="ml-2"
-            type="number"
-            label={steps.length > 1 ? '湯量' + String(i + 1) : '湯量'}
-            placeholder="0"
-            onChange={e => handelChange(e, i, 'water')}
-            onKeyDown={(e: any) => handleWaterField(e)}
-          />
+          <Tooltip title={tooltipTitle} arrow>
+            <TextField
+              id={'time-' + i}
+              className="mr-2"
+              type="number"
+              label="注入時間（秒）"
+              placeholder="0"
+              onChange={e => handleTimeChange(e, i)}
+              onKeyDown={(e: any) => handleTimeField(e)}
+            />
+          </Tooltip>
+          <Tooltip title={tooltipTitle}  arrow>
+            <TextField
+              id={'water-' + i}
+              className="ml-2"
+              type="number"
+              label="注入量（g）"
+              placeholder="0"
+              onChange={e => handleWaterChange(e, i)}
+              onKeyDown={(e: any) => handleWaterField(e)}
+            />
+            </Tooltip>
         </Box>
       ))}
     </Box>
