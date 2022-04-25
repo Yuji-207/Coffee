@@ -22,7 +22,7 @@ const Scale: React.FC<Props> = (props) => {
   const weight: string = displayWeight(props.weight);
   const className: string = props.className as string;
   return (
-    <Typography className={className} variant="h2">{weight}</Typography>
+    <Typography className={className}>{weight}</Typography>
   );
 };
 
