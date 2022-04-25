@@ -9,13 +9,16 @@ import Container from '@mui/material/Container';
 import Fade from '@mui/material/Fade';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
-import PauseIcon from '@mui/icons-material/Pause';
+import StopIcon from '@mui/icons-material/Stop';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RemoveIcon from '@mui/icons-material/Remove';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+
+import Header from '@components/header';
+import Footer from '@components/footer';
 
 import Step from '@interfaces/step'
 import useInterval from '@hooks/useInterval';
@@ -49,14 +52,14 @@ const displayTime = (time: number): string =>  {
 }
 
 
-const Home: NextPage = ({ onUpdate }: Params) => {
+export default function Home() {
 
 
   const [steps, setSteps] = React.useState<Step[]>([{water: 0, time: 0}]);
   const [water, setWater] = React.useState<number>(0);
   const [time, setTime] = React.useState<number>(0);
   const [count, setCount] = React.useState<boolean>(false);
-  const [reset, setReset] = React.useState<boolean>(false);
+  const [button, setButton]= React.useState<'start'|'stop'|'reset'>('start');
 
 
   const handleUpdate = () => {
@@ -123,12 +126,13 @@ const Home: NextPage = ({ onUpdate }: Params) => {
   const handleStart = (): void => {
     start();
     setCount(true);
-    setReset(true);
+    setButton('stop');
   };
 
 
   const handleStop = (): void => {
     stop();
+    setButton('reset');
   };
 
 
@@ -137,7 +141,7 @@ const Home: NextPage = ({ onUpdate }: Params) => {
     setCount(false);
     setWater(0);
     setTime(0);
-    setReset(false);
+    setButton('start');
   };
 
 
@@ -156,6 +160,8 @@ const Home: NextPage = ({ onUpdate }: Params) => {
 
 
   return (
+    <>
+    <Header />
     <Container className="justify-center text-center">
 
       {/* スケール */}
@@ -163,40 +169,12 @@ const Home: NextPage = ({ onUpdate }: Params) => {
         <Typography variant="h1" >{displayTime(time)}</Typography>
         <Typography variant="h2">{displayWeight(water)}</Typography>
       </Box>
-      
-      {/* ストップウォッチボタン */}
-      <Box className="fixed inset-x-0 bottom-0 flex flex-col">
-        <Fade in={reset}>
-          <Box>
-            <IconButton>
-              <RestartAltIcon color="primary" onClick={handleReset} className="text-5xl" />
-            </IconButton>
-          </Box>
-        </Fade>
-        {state === 'RUNNING' ? (
-          <Fade in={true}>
-            <Box>
-              <IconButton>
-                <PauseIcon color="primary" onClick={handleStop} sx={{'font-size': '9rem'}} />
-              </IconButton>
-            </Box>
-          </Fade>
-        ) : (
-          <Fade in={true}>
-            <Box>
-              <IconButton>
-                <PlayArrowIcon color="primary" onClick={handleStart} sx={{'font-size': '9rem'}} />
-              </IconButton>
-            </Box>
-          </Fade> 
-        )}
-      </Box>
 
       {/* ステップ */}
       <Stack spacing={2}>
         {steps.map((step: Step, i: number) => (
           <>
-            <Stack direction="row" justifyContent="center" spacing={2}>
+            <Stack className="relative" direction="row" justifyContent="center" spacing={2}>
               <TextField
                 className="water"
                 type="number"
@@ -212,7 +190,7 @@ const Home: NextPage = ({ onUpdate }: Params) => {
                 onChange={e => handelChange(e, i, 'time')}
               />
               {i === steps.length - 1 && !count && (
-                <Box sx={{position: 'absolute'}}>
+                <Box className="absolute inset-y-0 right-0">
                   <IconButton onClick={handleAdd}>
                     <AddIcon />
                   </IconButton>
@@ -229,8 +207,15 @@ const Home: NextPage = ({ onUpdate }: Params) => {
       </Stack>
 
     </Container>
+  <Footer>
+    {button == 'start' ? (
+      <PlayArrowIcon onClick={handleStart} />
+    ) : button == 'stop' ? (
+      <StopIcon onClick={handleStop} />
+    ) : (
+      <RestartAltIcon onClick={handleReset} />
+    )}
+    </Footer>
+  </>
   )
 }
-
-
-export default Home;
