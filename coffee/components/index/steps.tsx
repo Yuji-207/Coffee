@@ -60,7 +60,7 @@ const Steps: React.FC<Props> = (props) => {
   return (
     <Stack className="m-5" spacing={3}>
       {steps.map((step: Step, i: number) => (
-        <Box className="flex flex-row justify-center">
+        <Box className="flex flex-row justify-center" key={i+1}>
           <Box className="flex-grow flex justify-end mr-2">
             <TextField
               className="time"
