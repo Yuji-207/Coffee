@@ -1,29 +1,35 @@
 import React from 'react';
 
-import AddIcon from '@mui/icons-material/Add';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import RemoveIcon from '@mui/icons-material/Remove';
-import Stack from '@mui/material/Stack';
 import Step from '@interfaces/step'
 import TextField from '@mui/material/TextField';
-import { geteuid } from 'process';
+import Tooltip from '@mui/material/Tooltip';
 
 
 interface Props {
-  steps: any;
-  setSteps: any;
+  readOnly: boolean;
 }
 
 
 const Steps: React.FC<Props> = (props) => {
 
+  
+  const readOnly: boolean = props.readOnly;
 
-  const steps: any = props.steps;
-  const setSteps: any = props.setSteps;
+  const [tooltipTitle, setTooltipTitle] = React.useState<string>('');
+  const [steps, setSteps] = React.useState<Step[]>([{water: 0, time: 0}]);
 
 
-  const handelChange = (e: any, i: number, type: 'water'|'time'): void => {
+  React.useEffect(() => {
+    if (readOnly) {
+      setTooltipTitle('抽出開始後は編集できません')
+    } else {
+      setTooltipTitle('');
+    }
+  }, [readOnly]);
+
+
+  const validateNumber = (e: any, i: number, type: 'water'|'time'): void => {
 
     const value: string = e.target.value;
   
@@ -44,14 +50,44 @@ const Steps: React.FC<Props> = (props) => {
   }
 
 
-  const handleAdd = (): void => {
+  const handleWaterChange = (e: any, i: number): void => {
+
+    const value: string = e.target.value;
+    validateNumber(e, i, 'water');
+
+    if (value === '') {
+      setTooltipTitle('削除ボタンで前に戻れます');
+    } else if(value !== '') {
+      setTooltipTitle('改行ボタンでステップを追加できます');
+    }
+
+  }
+
+
+  const handleTimeChange = (e: any, i: number): void => {
+
+    const value: string = e.target.value;
+    validateNumber(e, i, 'time');
+
+    if (value === '' && i > 0) {
+      setTooltipTitle('削除ボタンでステップを削除できます');
+    } else if (value !== '') {
+      setTooltipTitle('改行ボタンで移動できます');
+    } else {
+      setTooltipTitle('');
+    }
+    
+  }
+
+
+  const addStep = (): void => {
     const copiedSteps: Step[] = [...steps];
     copiedSteps.push({water: 0, time: 0});
     setSteps(copiedSteps);
   }
 
 
-  const handleRemove = (): void => {
+  const removeStep = (): void => {
     const copiedSteps: Step[] = [...steps];
     copiedSteps.pop();
     setSteps(copiedSteps);
@@ -66,11 +102,13 @@ const Steps: React.FC<Props> = (props) => {
     
     if ((key === 'Enter' || key === 'Tab') && value !== '') {  // tabだと2ことぶ
       const timeField: any = document.getElementById('water-' + id);
+      setTooltipTitle('')
       timeField.focus();
     } else if ((key === 'Backspace' || key === 'backspace') && value === '' && id !== '0') {  // backspace？
-      await handleRemove();
+      await removeStep();
       id = String(Number(id) - 1); 
       const timeField: any = document.getElementById('water-' + id);
+      setTooltipTitle('')
       timeField.focus();
     }
 
@@ -84,65 +122,57 @@ const Steps: React.FC<Props> = (props) => {
       const key: any = e.key;
       
       if ((key === 'Enter' || key === 'Tab') && value !== '') {  // tabだと2ことぶ
-        await handleAdd();
+        await addStep();
         id = String(Number(id) + 1);
         const waterField: any = document.getElementById('time-' + id);
+        setTooltipTitle('削除ボタンでステップを削除できます')
         waterField.focus();
       } else if ((key === 'Backspace' || key === 'backspace') && value === '') {  // backspace？
         console.log(id)
         console.log('time-' + id)
         const waterField: any = document.getElementById('time-' + id);
+        setTooltipTitle('')
         waterField.focus();
       }
   
     }
-  
 
   return (
-    <Stack className="m-5" spacing={3}>
+    <Box className="m-5" >
       {steps.map((step: Step, i: number) => (
-        <Box className="flex flex-row justify-center" key={i}>
-          <Box className="flex-grow flex justify-end mr-2">
+        <Box className="step flex flex-row justify-center m-5" key={i}>
+          <Tooltip title={tooltipTitle} arrow>
             <TextField
               id={'time-' + i}
-              className="time"
+              className="mr-2"
               type="number"
-              label={steps.length > 1 ? '時間' + String(i + 1) : '時間'}
+              label="注入時間（秒）"
               placeholder="0"
-              onChange={e => handelChange(e, i, 'time')}
+              helperText={i + 1 + '投目'}
+              onChange={e => handleTimeChange(e, i)}
               onKeyDown={(e: any) => handleTimeField(e)}
+              InputProps={{
+                readOnly: readOnly ? true : false,
+              }}
             />
-          </Box>
-          <Box className="flex-grow flex justify-start ml-2">
+          </Tooltip>
+          <Tooltip title={tooltipTitle}  arrow>
             <TextField
               id={'water-' + i}
-              className="water"
+              className="ml-2"
               type="number"
-              label={steps.length > 1 ? '湯量' + String(i + 1) : '湯量'}
+              label="注入量（g）"
               placeholder="0"
-              onChange={e => handelChange(e, i, 'water')}
+              onChange={e => handleWaterChange(e, i)}
               onKeyDown={(e: any) => handleWaterField(e)}
+              InputProps={{
+                readOnly: readOnly ? true : false,
+              }}
             />
-            {/* {i === steps.length - 1 && (
-              <Box className="relative">
-                <Box className="absolute h-full flex">
-                  <Box className="flex flex-row self-center">
-                    <IconButton onClick={handleAdd}>
-                      <AddIcon fontSize="large" />
-                    </IconButton>
-                    {steps.length > 1 && (
-                      <IconButton onClick={handleRemove}>
-                        <RemoveIcon fontSize="large" />
-                      </IconButton>
-                    )}
-                  </Box>
-                </Box>
-              </Box>
-            )} */}
-          </Box>
+            </Tooltip>
         </Box>
       ))}
-    </Stack>
+    </Box>
   );
 
 }

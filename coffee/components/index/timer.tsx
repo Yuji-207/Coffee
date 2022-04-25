@@ -37,7 +37,7 @@ const Timer: React.FC<Props> = (props) => {
     <Typography className={className} variant="h2">{time}</Typography>
   );
 
-};
+}
 
 
 export default Timer;
