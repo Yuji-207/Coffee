@@ -9,7 +9,7 @@ const displayWeight = (weight: number): string => {
   const decimal: number = Math.floor(weight % 1 * 10);
   const display: string = String(integer).padStart(3, '0') + '.' + String(decimal) + ' g';
   return display;
-};
+}
 
 
 interface Props {
@@ -22,9 +22,9 @@ const Scale: React.FC<Props> = (props) => {
   const weight: string = displayWeight(props.weight);
   const className: string = props.className as string;
   return (
-    <Typography className={className}>{weight}</Typography>
+    <Typography className={className} variant="h1">{weight}</Typography>
   );
-};
+}
 
 
 export default Scale;

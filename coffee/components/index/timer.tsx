@@ -34,10 +34,10 @@ const Timer: React.FC<Props> = (props) => {
   const time: string = displayTime(props.time);
   const className: string = props.className as string;
   return (
-    <Typography className={className}>{time}</Typography>
+    <Typography className={className} variant="h2">{time}</Typography>
   );
 
-};
+}
 
 
 export default Timer;
