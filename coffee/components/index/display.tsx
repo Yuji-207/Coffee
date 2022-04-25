@@ -9,7 +9,7 @@ import Timer from '@components/index/timer';
 type Props = {
   time: number;
   weight: number;
-};
+}
   
   
 const Display: React.FC<Props> = (props) => {
@@ -19,12 +19,12 @@ const Display: React.FC<Props> = (props) => {
 
   return (
     <Box className="p-5 m-5">
-      <Timer className="text-6xl" time={time} />
-      <Scale className="text-5xl" weight={weight} />
+      <Scale weight={weight} />
+      <Timer time={time} />  {/* className="text-6xl */}
     </Box>
   );
 
-};
+}
 
 
 export default Display;
