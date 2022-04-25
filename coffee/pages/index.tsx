@@ -40,12 +40,11 @@ const Home: React.FC<void> = () => {
 
       const stepTime: number = step.time * 1000;  // ミリ秒に変換
 
-      if (time <= stepTime +  stepSum.time) {
-        if (stepTime === 0) {
-          setWater(step.water);
-        } else {
-          setWater((time - stepSum.time) / stepTime * step.water + stepSum.water);
-        };
+      if (stepTime === 0) {
+        setWater(step.water + stepSum.water);
+        break;
+      } else if (time <= stepTime +  stepSum.time) {
+        setWater((time - stepSum.time) / stepTime * step.water + stepSum.water);
         break;
       } else {
         stepSum.water += step.water;
@@ -75,8 +74,8 @@ const Home: React.FC<void> = () => {
     const steps: Step[] = [];
 
     for (let i = 0; i < stepLength; i++) {
-      const water: number = Number(getValueById('water' + i));
-      const time: number = Number(getValueById('time' + i));
+      const water: number = Number(getValueById('water-' + i));
+      const time: number = Number(getValueById('time-' + i));
       const step: Step = {water: water, time: time};
       steps.push(step);
     }
