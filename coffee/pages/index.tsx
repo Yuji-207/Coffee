@@ -6,6 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
+import Fade from '@mui/material/Fade';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -55,6 +56,7 @@ const Home: NextPage = ({ onUpdate }: Params) => {
   const [water, setWater] = React.useState<number>(0);
   const [time, setTime] = React.useState<number>(0);
   const [count, setCount] = React.useState<boolean>(false);
+  const [reset, setReset] = React.useState<boolean>(false);
 
 
   const handleUpdate = () => {
@@ -121,6 +123,7 @@ const Home: NextPage = ({ onUpdate }: Params) => {
   const handleStart = (): void => {
     start();
     setCount(true);
+    setReset(true);
   };
 
 
@@ -134,6 +137,7 @@ const Home: NextPage = ({ onUpdate }: Params) => {
     setCount(false);
     setWater(0);
     setTime(0);
+    setReset(false);
   };
 
 
@@ -152,35 +156,63 @@ const Home: NextPage = ({ onUpdate }: Params) => {
 
 
   return (
-    <Container>
+    <Container className="justify-center text-center">
 
+      {/* スケール */}
       <Box m={2} pt={3}>
-        <Typography variant="h1" align="center">{displayTime(time)}</Typography>
-        <Typography variant="h2" align="center">{displayWeight(water)}</Typography>
+        <Typography variant="h1" >{displayTime(time)}</Typography>
+        <Typography variant="h2">{displayWeight(water)}</Typography>
+      </Box>
+      
+      {/* ストップウォッチボタン */}
+      <Box className="fixed inset-x-0 bottom-0 flex flex-col">
+        <Fade in={reset}>
+          <Box>
+            <IconButton>
+              <RestartAltIcon color="primary" onClick={handleReset} className="text-5xl" />
+            </IconButton>
+          </Box>
+        </Fade>
+        {state === 'RUNNING' ? (
+          <Fade in={true}>
+            <Box>
+              <IconButton>
+                <PauseIcon color="primary" onClick={handleStop} sx={{'font-size': '9rem'}} />
+              </IconButton>
+            </Box>
+          </Fade>
+        ) : (
+          <Fade in={true}>
+            <Box>
+              <IconButton>
+                <PlayArrowIcon color="primary" onClick={handleStart} sx={{'font-size': '9rem'}} />
+              </IconButton>
+            </Box>
+          </Fade> 
+        )}
       </Box>
 
-      <Box>
-        <Stack justifyContent="center" spacing={2}>
-          {steps.map((step: Step, i: number) => (
-            <>
-              <Stack direction="row" justifyContent="center" spacing={2}>
-                <TextField
-                  className="water"
-                  type="number"
-                  label={steps.length > 1 ? '湯量' + String(i + 1) : '湯量'}
-                  placeholder="0"
-                  onChange={e => handelChange(e, i, 'water')}
-                />
-                <TextField
-                  className="time"
-                  type="number"
-                  label={steps.length > 1 ? '時間' + String(i + 1) : '時間'}
-                  placeholder="0"
-                  onChange={e => handelChange(e, i, 'time')}
-                />
-              </Stack>
+      {/* ステップ */}
+      <Stack spacing={2}>
+        {steps.map((step: Step, i: number) => (
+          <>
+            <Stack direction="row" justifyContent="center" spacing={2}>
+              <TextField
+                className="water"
+                type="number"
+                label={steps.length > 1 ? '湯量' + String(i + 1) : '湯量'}
+                placeholder="0"
+                onChange={e => handelChange(e, i, 'water')}
+              />
+              <TextField
+                className="time"
+                type="number"
+                label={steps.length > 1 ? '時間' + String(i + 1) : '時間'}
+                placeholder="0"
+                onChange={e => handelChange(e, i, 'time')}
+              />
               {i === steps.length - 1 && !count && (
-                <div>
+                <Box sx={{position: 'absolute'}}>
                   <IconButton onClick={handleAdd}>
                     <AddIcon />
                   </IconButton>
@@ -189,26 +221,11 @@ const Home: NextPage = ({ onUpdate }: Params) => {
                       <RemoveIcon />
                     </IconButton>
                   )}
-                </div>
+                </Box>
               )}
-            </>
-          ))}
-        </Stack>
-      </Box>
-
-      <Stack direction="row" justifyContent="center" spacing={8}>
-        <Button variant="contained">
-          <RestartAltIcon  color="primary" onClick={handleReset} />
-        </Button>
-        {state === 'RUNNING' ? (
-          <Button variant="contained">
-            <PauseIcon  color="primary" onClick={handleStop} />
-          </Button>
-        ) : (
-          <Button variant="contained">
-            <PlayArrowIcon color="primary" onClick={handleStart} />
-          </Button>
-        )}
+            </Stack>
+          </>
+        ))}
       </Stack>
 
     </Container>
