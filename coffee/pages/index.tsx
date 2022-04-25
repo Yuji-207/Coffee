@@ -15,41 +15,16 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 
-import Header from '@components/header';
 import Footer from '@components/footer';
+import Header from '@components/header';
+import Timer from '@components/index/timer';
 
 import Step from '@interfaces/step'
 import useInterval from '@hooks/useInterval';
 
 
-const displayWeight = (weight: number): string => {
-  const integer: number = Math.floor(weight);
-  const decimal: number = Math.floor(weight % 1 * 10);
-  const display: string = String(integer).padStart(3, '0') + '.' + String(decimal) + ' g';
-  return display;
-};
 
-
-const displayTime = (time: number): string =>  {
-
-  let centi: number | string = time % 1000;
-  time -= centi;
-  centi /= 10;
-  centi = String(centi).padStart(2, '0');
-
-  let seconds: number | string = time % 60000;
-  time -= seconds;
-  seconds /= 1000;
-  seconds = String(seconds).padStart(2, '0');
-
-  let minutes: number | string = time / 60000;
-  minutes = String(minutes).padStart(2, '0');
-
-  return `${minutes}:${seconds}:${centi}`;
-
-}
 
 
 export default function Home() {
@@ -166,8 +141,8 @@ export default function Home() {
 
       {/* スケール */}
       <Box m={2} pt={3}>
-        <Typography variant="h1" >{displayTime(time)}</Typography>
-        <Typography variant="h2">{displayWeight(water)}</Typography>
+        <Timer time={time} />
+        
       </Box>
 
       {/* ステップ */}
