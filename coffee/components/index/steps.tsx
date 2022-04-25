@@ -12,7 +12,6 @@ import TextField from '@mui/material/TextField';
 interface Props {
   steps: any;
   setSteps: any;
-  count: boolean;
 }
 
 
