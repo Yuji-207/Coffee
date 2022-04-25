@@ -23,16 +23,20 @@ const displayTime = (time: number): string =>  {
 }
 
 
-type Props = {
+interface Props {
   time: number;
-};
+  variant?: string;
+  className?: string;
+}
 
 
 const Timer: React.FC<Props> = (props) => {
   const time: string = displayTime(props.time);
+  const className: string = props.className as string;
   return (
-    <Typography variant="h1" >{time}</Typography>
+    <Typography className={className} variant="h1">{time}</Typography>
   );
+
 };
 
 

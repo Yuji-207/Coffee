@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Typography from '@mui/material/Typography';
+import { ClassNames } from '@emotion/react';
 
 
 const displayWeight = (weight: number): string => {
@@ -11,17 +12,19 @@ const displayWeight = (weight: number): string => {
 };
 
 
-  type Props = {
-    weight: number;
-  };
+interface Props {
+  weight: number;
+  className?: string;
+}
 
 
-  const Scale: React.FC<Props> = (props) => {
-    const weight: string = displayWeight(props.weight);
-    return (
-      <Typography variant="h2">{weight}</Typography>
-    );
-  };
+const Scale: React.FC<Props> = (props) => {
+  const weight: string = displayWeight(props.weight);
+  const className: string = props.className as string;
+  return (
+    <Typography className={className} variant="h2">{weight}</Typography>
+  );
+};
 
 
-  export default Scale;
+export default Scale;
