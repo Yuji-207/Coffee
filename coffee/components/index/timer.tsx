@@ -1,4 +1,6 @@
 import React from 'react';
+
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 
@@ -25,16 +27,15 @@ const displayTime = (time: number): string =>  {
 
 interface Props {
   time: number;
-  variant?: string;
-  className?: string;
 }
 
 
 const Timer: React.FC<Props> = (props) => {
   const time: string = displayTime(props.time);
-  const className: string = props.className as string;
   return (
-    <Typography className={className} variant="h2">{time}</Typography>
+    <Box my={2}>
+      <Typography variant="h2" component="p">{time}</Typography>
+    </Box>
   );
 
 }

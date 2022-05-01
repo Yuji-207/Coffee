@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import Step from '@interfaces/step'
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
@@ -94,63 +95,67 @@ const Steps: React.FC<Props> = (props) => {
   }
 
 
-  const handleTimeField = async (e: any) => {
+  const focusElementByID = (id: string): void => {
+    const element: HTMLElement = document.getElementById(id) as HTMLElement;
+    element.focus();
+  }
+
+
+  const moveWaterField = (e: any) => {
 
     let id: string = e.target.id.slice(5);
     const value: string = e.target.value;
     const key: any = e.key;
     
-    if ((key === 'Enter' || key === 'Tab') && value !== '') {  // tabだと2ことぶ
-      const timeField: any = document.getElementById('water-' + id);
-      setTooltipTitle('')
-      timeField.focus();
-    } else if ((key === 'Backspace' || key === 'backspace') && value === '' && id !== '0') {  // backspace？
-      await removeStep();
-      id = String(Number(id) - 1); 
-      const timeField: any = document.getElementById('water-' + id);
-      setTooltipTitle('')
-      timeField.focus();
+    if ((key === 'Enter' || key === 'Tab') && value !== '') {  // tabだと2こ飛ぶ
+      focusElementByID('water-' + id);
+      setTooltipTitle('');
+    } else if ((key === 'Backspace') && value === '' && id !== '0') {
+      id = String(Number(id) - 1);
+      focusElementByID('water-' + id);
+      removeStep();
+      setTooltipTitle('');
     }
 
   }
 
 
-  const handleWaterField = async (e: any) => {
+  const moveTimeField = async (e: any) => {
 
-      let id: string = e.target.id.slice(6);
-      const value: string = e.target.value;
-      const key: any = e.key;
-      
-      if ((key === 'Enter' || key === 'Tab') && value !== '') {  // tabだと2ことぶ
-        await addStep();
-        id = String(Number(id) + 1);
-        const waterField: any = document.getElementById('time-' + id);
-        setTooltipTitle('削除ボタンでステップを削除できます')
-        waterField.focus();
-      } else if ((key === 'Backspace' || key === 'backspace') && value === '') {  // backspace？
-        console.log(id)
-        console.log('time-' + id)
-        const waterField: any = document.getElementById('time-' + id);
-        setTooltipTitle('')
-        waterField.focus();
-      }
-  
+    let id: string = e.target.id.slice(6);
+    const value: string = e.target.value;
+    const key: any = e.key;
+    
+    if ((key === 'Enter' || key === 'Tab') && value !== '') {  // tabだと2ことぶ
+      id = String(Number(id) + 1);
+      await addStep();
+      focusElementByID('time-' + id);
+      setTooltipTitle('削除ボタンでステップを削除できます')
+    } else if ((key === 'Backspace' || key === 'backspace') && value === '') {  // backspace？
+      focusElementByID('time-' + id);
+      setTooltipTitle('');
     }
 
+  }
+
+
+
+
+
   return (
-    <Box className="m-5" >
+    
+    <Stack id="steps" spacing={2} m={3} mb={10}>
       {steps.map((step: Step, i: number) => (
-        <Box className="step flex flex-row justify-center m-5" key={i}>
+        <Stack className="step" key={i} direction="row" spacing={2}>
           <Tooltip title={tooltipTitle} arrow>
             <TextField
               id={'time-' + i}
-              className="mr-2"
               type="number"
               label="注入時間（秒）"
               placeholder="0"
               helperText={i + 1 + '投目'}
               onChange={e => handleTimeChange(e, i)}
-              onKeyDown={(e: any) => handleTimeField(e)}
+              onKeyDown={(e: any) => moveWaterField(e)}
               InputProps={{
                 readOnly: readOnly ? true : false,
               }}
@@ -159,20 +164,19 @@ const Steps: React.FC<Props> = (props) => {
           <Tooltip title={tooltipTitle}  arrow>
             <TextField
               id={'water-' + i}
-              className="ml-2"
               type="number"
               label="注入量（g）"
               placeholder="0"
               onChange={e => handleWaterChange(e, i)}
-              onKeyDown={(e: any) => handleWaterField(e)}
+              onKeyDown={(e: any) => moveTimeField(e)}
               InputProps={{
                 readOnly: readOnly ? true : false,
               }}
             />
             </Tooltip>
-        </Box>
+        </Stack>
       ))}
-    </Box>
+    </Stack>
   );
 
 }

@@ -3,9 +3,9 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import StopIcon from '@mui/icons-material/Stop';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 import Display from '@components/index/display';
+import EvaluateModal from '@components/index/evaluate-modal';
 import Footer from '@components/footer';
 import Header from '@components/header';
 import Steps from '@components/index/steps';
@@ -16,11 +16,20 @@ import useInterval from '@hooks/useInterval';
 
 const Home: React.FC<void> = () => {
 
-
   const [steps, setSteps] = React.useState<Step[]>([{water: 0, time: 0}]);
   const [water, setWater] = React.useState<number>(0);
   const [time, setTime] = React.useState<number>(0);
-  const [button, setButton]= React.useState<'start'|'stop'|'reset'>('start');
+  const [button, setButton]= React.useState<'start'|'stop'>('start');
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+
+
+  React.useEffect(() => {
+    if (!modalOpen) {
+      setWater(0);
+      setTime(0);
+      setButton('start');
+    }
+  }, [modalOpen]);
 
 
   const handleUpdate = () => {
@@ -94,15 +103,7 @@ const Home: React.FC<void> = () => {
 
   const handleStop = (): void => {
     stop();
-    setButton('reset');
-  }
-
-
-  const handleReset = (): void => {
-    stop();
-    setWater(0);
-    setTime(0);
-    setButton('start');
+    setModalOpen(true);
   }
 
 
@@ -113,13 +114,12 @@ const Home: React.FC<void> = () => {
         <Display time={time} weight={water} />
         <Steps readOnly={button !== 'start'} />
       </Box>
+      <EvaluateModal open={modalOpen} setOpen={setModalOpen}/>
       <Footer>
         {button == 'start' ? (
           <PlayArrowIcon onClick={handleStart} />
-        ) : button == 'stop' ? (
-          <StopIcon onClick={handleStop} />
         ) : (
-          <RestartAltIcon onClick={handleReset} />
+          <StopIcon onClick={handleStop} />
         )}
       </Footer>
     </>
