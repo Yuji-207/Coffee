@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import Step from '@interfaces/step'
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
@@ -138,14 +139,17 @@ const Steps: React.FC<Props> = (props) => {
   }
 
 
+
+
+
   return (
-    <Box className="m-5" >
+    
+    <Stack id="steps" spacing={2} m={3} mb={10}>
       {steps.map((step: Step, i: number) => (
-        <Box className="step flex flex-row justify-center m-5" key={i}>
+        <Stack className="step" key={i} direction="row" spacing={2}>
           <Tooltip title={tooltipTitle} arrow>
             <TextField
               id={'time-' + i}
-              className="mr-2"
               type="number"
               label="注入時間（秒）"
               placeholder="0"
@@ -160,7 +164,6 @@ const Steps: React.FC<Props> = (props) => {
           <Tooltip title={tooltipTitle}  arrow>
             <TextField
               id={'water-' + i}
-              className="ml-2"
               type="number"
               label="注入量（g）"
               placeholder="0"
@@ -171,9 +174,9 @@ const Steps: React.FC<Props> = (props) => {
               }}
             />
             </Tooltip>
-        </Box>
+        </Stack>
       ))}
-    </Box>
+    </Stack>
   );
 
 }
